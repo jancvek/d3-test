@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Home temperature</title>
+        <script src="https://d3js.org/d3.v4.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <style>
+
+    </style>
+    <body>
+        
+        <div id="my_dataviz"></div>
+
+        <script>
+
+            var TEMP_MIN_DISPLAY = 15;  //kje se začne pogled grafa pri stopinjah celzijah
+            var TEMP_LINE = 20; //kje je črta v stopinjah celzija
+            var TEMP_LINE_MIN = 17;
+            var TEMP_LINE_MAX = 23;
+
+            $( document ).ready(function() {
+                debugger;
+                // set the dimensions and margins of the graph
+                var margin = {top: 10, right: 30, bottom: 30, left: 60},
+                    width = 460 - margin.left - margin.right,
+                    height = 400 - margin.top - margin.bottom;
+                
+                // append the svg object to the body of the page
+                var svg = d3.select("#my_dataviz")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+                
+                
+                
+                // define function for time parse 
+                var parseDate = d3.timeParse("%Y-%m-%d");
+
+                //Read the data
+                d3.json("data.json",function(data){
+                    // Add X axis --> it is a date format
+                    var x = d3.scaleTime()
+                    .domain(d3.extent(data, function(d) { return parseDate(d.date); }))
+                    .range([ 0, width ]);
+                    svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+                
+                    // Add Y axis
+                    var y = d3.scaleLinear()
+                    .domain([TEMP_MIN_DISPLAY, d3.max(data, function(d) { return +d.value; })])
+                    .range([ height, 0 ]);
+                    svg.append("g")
+                    .call(d3.axisLeft(y));
+                
+                    // Add the line
+                    svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x(parseDate(d.date)) })
+                        .y(function(d) { return y(d.value) })
+                        )      
+
+                    //DODANA ČRTA NA VIŠINI ENE
+                    svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "silver")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x(parseDate(d.date)) })
+                        .y(function(d) { return y(TEMP_LINE) })
+                        )       
+
+                    //DODANA ČRTA NA VIŠINI ENE
+                    svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "blue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x(parseDate(d.date)) })
+                        .y(function(d) { return y(TEMP_LINE_MIN) })
+                        ) 
+
+                    //DODANA ČRTA NA VIŠINI ENE
+                    svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "red")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x(parseDate(d.date)) })
+                        .y(function(d) { return y(TEMP_LINE_MAX) })
+                        )     
+                    })  
+            });
+                    // Add the line
+       
+                    
+                
+
+                // // When reading the csv, I must format variables:
+                // function(d){
+                //     return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+                // },
+                
+                // // Now I can use this dataset:
+                // function(data) {
+                
+                //     // Add X axis --> it is a date format
+                //     var x = d3.scaleTime()
+                //     .domain(d3.extent(data, function(d) { return d.date; }))
+                //     .range([ 0, width ]);
+                //     svg.append("g")
+                //     .attr("transform", "translate(0," + height + ")")
+                //     .call(d3.axisBottom(x));
+                
+                //     // Add Y axis
+                //     var y = d3.scaleLinear()
+                //     .domain([0, d3.max(data, function(d) { return +d.value; })])
+                //     .range([ height, 0 ]);
+                //     svg.append("g")
+                //     .call(d3.axisLeft(y));
+                
+                //     // Add the line
+                //     svg.append("path")
+                //     .datum(data)
+                //     .attr("fill", "none")
+                //     .attr("stroke", "steelblue")
+                //     .attr("stroke-width", 1.5)
+                //     .attr("d", d3.line()
+                //         .x(function(d) { return x(d.date) })
+                //         .y(function(d) { return y(d.value) })
+                //         )            
+                //     })  
+                // });
+        
+            </script>
+    </body>
+</html>
